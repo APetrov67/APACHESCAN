@@ -92,10 +92,10 @@ namespace ApacheVersionScan
             }
 
             // Запись в БД
-
-            using (ApacheContext db = new ApacheContext())
+            
+            try
             {
-                try
+                using (ApacheContext db = new ApacheContext())
                 {
                     var apache = new Apache { ScanDate = DateTime.Now, Product = stringProduct, Version = stringVersion };
                     db.Apaches.Add(apache);
@@ -103,13 +103,14 @@ namespace ApacheVersionScan
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Объект успешно сохранен");
                     Console.ResetColor();
-                }
-                catch
-                {
-                    ShowWarning("Не удалось записать в БД");
+
                 }
             }
-
+            catch
+            {
+                ShowWarning("Не удалось записать в БД");
+            }
+            
             DeleteFileXml();
         }
 
