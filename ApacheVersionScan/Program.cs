@@ -19,7 +19,7 @@ namespace ApacheVersionScan
 
             if (!int.TryParse(portString, out var port) || port < 0 || port > 65535)
             {
-                ShowMessageWarn("Порт должен быть числом в диапазоне от 0 до 65535");
+                ShowWarning("Порт должен быть числом в диапазоне от 0 до 65535");
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace ApacheVersionScan
                 }
                 catch
                 {
-                    ShowMessageWarn("Отсутствует Nmap.exe");
+                    ShowWarning("Отсутствует Nmap.exe");
                     return;
                 }
 
@@ -75,7 +75,7 @@ namespace ApacheVersionScan
 
                 if (product == null || version == null)
                 {
-                    ShowMessageWarn($"На данном порту - {port} не запущен Apache ");
+                    ShowWarning($"На данном порту - {port} не запущен Apache ");
                     DeleteFileXml();
                     return;
                 }
@@ -85,7 +85,7 @@ namespace ApacheVersionScan
 
                 if (string.IsNullOrWhiteSpace(stringProduct) || string.IsNullOrWhiteSpace(stringVersion) || !stringProduct.Contains("APACHE"))
                 {
-                    ShowMessageWarn($"На данном порту - {port} запущен другой сервер");
+                    ShowWarning($"На данном порту - {port} запущен другой сервер");
                     DeleteFileXml();
                     return;
                 }
@@ -106,7 +106,7 @@ namespace ApacheVersionScan
                 }
                 catch
                 {
-                    ShowMessageWarn("Не удалось записать в БД");
+                    ShowWarning("Не удалось записать в БД");
                 }
             }
 
@@ -122,7 +122,7 @@ namespace ApacheVersionScan
             File.Delete(pathFileXml);
         }
 
-        static private void ShowMessageWarn(string warn)
+        static private void ShowWarning(string warn)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine();
