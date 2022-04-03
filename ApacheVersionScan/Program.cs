@@ -19,9 +19,7 @@ namespace ApacheVersionScan
 
             if (!int.TryParse(portString, out var port) || port < 0 || port > 65535)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Порт должен быть числом в диапазоне от 0 до 65535");
-                Console.ResetColor();
+                ShowMessageWarn("Порт должен быть числом в диапазоне от 0 до 65535");
                 return;
             }
 
@@ -47,9 +45,7 @@ namespace ApacheVersionScan
                 }
                 catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Отсутствует Nmap.exe");
-                    Console.ResetColor();
+                    ShowMessageWarn("Отсутствует Nmap.exe");
                     return;
                 }
 
@@ -79,10 +75,7 @@ namespace ApacheVersionScan
 
                 if (product == null || version == null)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine();
-                    Console.WriteLine($"На данном порту - {port} не запущен Apache ");
-                    Console.ResetColor();
+                    ShowMessageWarn($"На данном порту - {port} не запущен Apache ");
                     DeleteFileXml();
                     return;
                 }
@@ -92,10 +85,7 @@ namespace ApacheVersionScan
 
                 if (string.IsNullOrWhiteSpace(stringProduct) || string.IsNullOrWhiteSpace(stringVersion) || !stringProduct.Contains("APACHE"))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine();
-                    Console.WriteLine($"На данном порту - {port} запущен другой сервер");
-                    Console.ResetColor();
+                    ShowMessageWarn($"На данном порту - {port} запущен другой сервер");
                     DeleteFileXml();
                     return;
                 }
@@ -105,12 +95,19 @@ namespace ApacheVersionScan
 
             using (ApacheContext db = new ApacheContext())
             {
-                var apache = new Apache { ScanDate = DateTime.Now, Product = stringProduct, Version = stringVersion };
-                db.Apaches.Add(apache);
-                db.SaveChanges();
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Объект успешно сохранен");
-                Console.ResetColor();
+                try
+                {
+                    var apache = new Apache { ScanDate = DateTime.Now, Product = stringProduct, Version = stringVersion };
+                    db.Apaches.Add(apache);
+                    db.SaveChanges();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Объект успешно сохранен");
+                    Console.ResetColor();
+                }
+                catch
+                {
+                    ShowMessageWarn("Не удалось записать в БД");
+                }
             }
 
             DeleteFileXml();
@@ -123,6 +120,14 @@ namespace ApacheVersionScan
             var pathAssembly = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var pathFileXml = Path.Combine(pathAssembly, "8081.xml");
             File.Delete(pathFileXml);
+        }
+
+        static private void ShowMessageWarn(string warn)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine();
+            Console.WriteLine(warn);
+            Console.ResetColor();
         }
     }
 }
