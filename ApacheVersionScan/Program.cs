@@ -120,7 +120,7 @@ namespace ApacheVersionScan
 
             if(apacheCount.Count == 0)
             {
-                ShowWarning($"На данном диапазоне портов - {port1} - {port2} либо на данном хосте - {IPhostString} не запущен APACHE");
+                ShowWarning($"На данном диапазоне портов - {port1} - {port2} либо на данном хосте - {IPhostString} не запущен APACHE, либо данный запрос не вернул статус 404");
                 DeleteFileXml();
                 return;
             }
